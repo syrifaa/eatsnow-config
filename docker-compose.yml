@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  php:
+    container_name: eatsnow-app
+    image: php:apache
+    build:
+      context: ../tugas-besar-1
+      dockerfile: Dockerfile
+    volumes:
+      - ../tugas-besar-1:/var/www/html
+    ports:
+      - 8080:80
+  php-db:
+    container_name: eatsnow-app-db
+    image: mysql:8.0
+    ports:
+      - 3307:3306
+    volumes:
+      - "../tugas-besar-1/db:/docker-entrypoint-initdb.d" 
+    env_file:
+      - ../tugas-besar-1/.env
+  rest-db:
+    container_name: eatsnow-rest-db
+    image: mysql:8.0
+    ports:
+      - 3308:3306
+    env_file:
+      - ../eatsnow-rest-service/.env
+  rest:
+    container_name: eatsnow-rest
+    build:
+      context: ../eatsnow-rest-service
+      dockerfile: Dockerfile
+    depends_on:
+      - rest-db
+    volumes:
+      - ../eatsnow-rest-service/src:/eatsnow-rest/app/src
+    env_file:
+      - ../eatsnow-rest-service/.env
+    stdin_open: true
+    ports:
+      - 8010:8010
+
+  
