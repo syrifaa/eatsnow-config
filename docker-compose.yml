@@ -1,5 +1,15 @@
 version: '3.8'
 services:
+  spa:
+    container_name: eatsnow-premium
+    build:
+      context: ../eatsnow-spa
+      dockerfile: Dockerfile
+    volumes:
+      - ../eatsnow-spa/src:/eatsnow-spa/src
+      - ../eatsnow-spa/public:/eatsnow-spa/public
+    ports:
+      - 3000:3000
   php:
     container_name: eatsnow-app
     image: php:apache
