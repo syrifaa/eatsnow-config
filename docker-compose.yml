@@ -4,10 +4,10 @@ services:
     container_name: eatsnow-app
     image: php:apache
     build:
-      context: ../tugas-besar-1
+      context: ../eatsnow-app
       dockerfile: Dockerfile
     volumes:
-      - ../tugas-besar-1:/var/www/html
+      - ../eatsnow-app:/var/www/html
     ports:
       - 8080:80
   php-db:
@@ -16,9 +16,9 @@ services:
     ports:
       - 3307:3306
     volumes:
-      - "../tugas-besar-1/db:/docker-entrypoint-initdb.d" 
+      - "../eatsnow-app/db:/docker-entrypoint-initdb.d" 
     env_file:
-      - ../tugas-besar-1/.env
+      - ../eatsnow-app/.env
   rest-db:
     container_name: eatsnow-rest-db
     image: mysql:8.0
@@ -34,11 +34,34 @@ services:
     depends_on:
       - rest-db
     volumes:
-      - ../eatsnow-rest-service/src:/eatsnow-rest/app/src
+      - ../eatsnow-rest-service/src:/eatsnow-rest/src
     env_file:
       - ../eatsnow-rest-service/.env
     stdin_open: true
     ports:
       - 8010:8010
 
-  
+  soap-db:
+    container_name: eatsnow-soap-db
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=eatsnow-soap-service
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+    ports:
+      - 3309:3306
+    volumes:
+      - "../eatsnow-soap-service/eatsnowsoap/db:/docker-entrypoint-initdb.d" 
+
+  soap:
+    container_name: eatsnow-soap
+    build:
+      context: ../eatsnow-soap-service/eatsnowsoap
+      dockerfile: dockerfile
+    depends_on:
+      - soap-db
+    volumes:
+      - ../eatsnow-soap-service/src:/app/src
+    ports:
+      - 8020:8020
